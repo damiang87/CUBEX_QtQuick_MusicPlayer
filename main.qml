@@ -113,6 +113,8 @@ ApplicationWindow {
                 FileDialog{
                     id: file
                     onFileUrlChanged: {
+                        media1.stop()
+                        progresPlay.value = 0
                         status.text = file.fileUrl
                     }
                 }
@@ -227,6 +229,7 @@ ApplicationWindow {
             function seek(){
                 var pos = progresPlay.value
                 if(media1.seekable == false)    return;
+                if(pos == 0)    return;
                 media1.seek(pos);
             }
             onValueChanged: {
