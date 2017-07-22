@@ -23,7 +23,6 @@ ApplicationWindow {
             id: tools
             width: root.width
             height: 30
-            anchors.top: parent
             color: "#313131"
             Label{
                 anchors.centerIn: parent
@@ -76,7 +75,10 @@ ApplicationWindow {
                 MouseArea{
                     anchors.fill: parent
                     cursorShape: "PointingHandCursor"
-                    onClicked: root.close()
+                    onClicked: {
+                        media1.stop()
+                        root.close()
+                    }
                 }
             }
             //minimize
@@ -232,8 +234,30 @@ ApplicationWindow {
             }
         }
 
+        //progress StatusBar
+        ProgressBar{
+            id: progressStatus
+            width: parent.width - 30
+            height: 5
+            x: x + 15
+            y: y + nav.height + tools.height + volumeL.height + progresL.height + volumeSlider.height + 15 + progresPlay.height
+            minimumValue: 0
+            maximumValue: media1.duration
+            value: media1.position
+        }
+        //Playlist
+        Rectangle{
+            width: parent.width
+            height: parent.height / 2 + 30
+            color: "darkkhaki"
+            y: root.height - height - stat.height
+            //addlist
+            //............
+        }
+
         //status bar
         Rectangle{
+            id: stat
             height: nav.height
             width: parent.width
             anchors.bottom: parent.bottom
@@ -246,8 +270,6 @@ ApplicationWindow {
                 text: "source..."
                 textFormat: {
                     font.pixelSize = 11
-                    color = "black"
-                    verticalCenter = true
                 }
             }
         }
