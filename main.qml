@@ -4,16 +4,23 @@ import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.3
 import QtQuick.Dialogs 1.2
 import QtMultimedia 5.9
+import QtQuick.Window 2.3
 
-ApplicationWindow {
+Window {
     id: root
     visible: true
-    flags: Qt.FramelessWindowHint |
-           Qt.WindowMinimizeButtonHint |
-           Qt.Window
+    flags: {
+        Qt.FramelessWindowHint |
+                Qt.WindowMinimizeButtonHint |
+                Qt.Window
+    }
     width: 350
     height: 500
-    title: qsTr("Hello World")
+    minimumHeight: 500
+    maximumHeight: 500
+    minimumWidth: 350
+    maximumWidth: 350
+    title: qsTr("CUBEX")
     color: "transparent"
     //logo
     Rectangle{
@@ -50,8 +57,8 @@ ApplicationWindow {
         Audio{
             id: media1
             autoPlay: true
-            source: file.fileUrl
             volume: volumeSlider.value
+            source: myFile.fileUrl
         }
 
         //navigation
@@ -111,18 +118,29 @@ ApplicationWindow {
                     font.letterSpacing = 2
                 }
                 FileDialog{
-                    id: file
+                    id: myFile
+                    selectMultiple: true
                     onFileUrlChanged: {
                         media1.stop()
                         progresPlay.value = 0
-                        status.text = file.fileUrl
+                        statusText.text = fileUrl
+                        media1.source = fileUrl
+                        media1.play()
+                    }
+                    onFileUrlsChanged: {
+                        musicModel.clear()
+                        var cnt = fileUrls.length;
+                        for(var i =0; i < cnt; i++)
+                        {
+                            musicModel.append({index: i, name: fileUrls[i]});
+                        }
                     }
                 }
 
                 MouseArea{
                     anchors.fill: parent
                     cursorShape: "PointingHandCursor"
-                    onClicked: file.open()
+                    onClicked: myFile.open()
                 }
             }
 
@@ -162,6 +180,7 @@ ApplicationWindow {
             }
             //pause
             Label{
+                id: pauseLabel
                 width: 40
                 height: parent.height
                 x: parent.x + fileL.width + playl.width + stopl.width + 65
@@ -230,7 +249,7 @@ ApplicationWindow {
                 var pos = progresPlay.value
                 if(media1.seekable == false)    return;
                 if(pos == 0)    return;
-                media1.seek(pos);
+                media1.seek(Math.round(pos));
             }
             onValueChanged: {
                 seek()
@@ -248,14 +267,24 @@ ApplicationWindow {
             maximumValue: media1.duration
             value: media1.position
         }
+
         //Playlist
         Rectangle{
-            width: parent.width
+            id: listRec
+            width: parent.width - 10
             height: parent.height / 2 + 30
-            color: "darkkhaki"
+            color: "grey"
             y: root.height - height - stat.height
+            x: parent.x + 5
             //addlist
-            //............
+            MusicListModel{id: musicModel}
+            MusicDelegate{id: musicDel}
+            ListView{
+                anchors.fill: parent
+                model: musicModel
+                delegate: musicDel
+                spacing: 5
+            }
         }
 
         //status bar
@@ -264,15 +293,20 @@ ApplicationWindow {
             height: nav.height
             width: parent.width
             anchors.bottom: parent.bottom
-            color: "#777777"
+            color: "#424242"
             Label{
-                id: status
-                width: parent.width
+                id: statusLabel
+                width: parent.width - 10
                 height: parent.height - 5
                 y: y + 2
-                text: "source..."
-                textFormat: {
-                    font.pixelSize = 11
+                x: parent.x + 5
+                color: "grey"
+                Text{
+                    id: statusText
+                    text: "source..."
+                    elide: Text.ElideRight
+                    font.pixelSize: 11
+                    color: "grey"
                 }
             }
         }
