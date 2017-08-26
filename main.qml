@@ -284,6 +284,7 @@ Window {
                 model: musicModel
                 delegate: musicDel
                 spacing: 5
+                clip: true
             }
         }
 
